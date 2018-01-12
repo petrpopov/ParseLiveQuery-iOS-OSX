@@ -19,9 +19,9 @@ func objcTask<T>(_ task: Task<T>) -> BFTask<T> where T: AnyObject {
             taskCompletionSource.trySetCancelled()
         } else if task.faulted {
             let error = (task.error as NSError?) ?? NSError(domain: unknownDomain, code: -1, userInfo: nil)
-            taskCompletionSource.trySet(error: error)
+            taskCompletionSource.trySetError(error)
         } else {
-            taskCompletionSource.trySet(result: task.result)
+            taskCompletionSource.trySetResult(task.result)
         }
     }
     return taskCompletionSource.task
@@ -29,7 +29,8 @@ func objcTask<T>(_ task: Task<T>) -> BFTask<T> where T: AnyObject {
 
 func swiftTask(_ task: BFTask<AnyObject>) -> Task<AnyObject> {
     let taskCompletionSource = TaskCompletionSource<AnyObject>()
-    task.continueWith(block: { task in
+    
+    task.continue( { (task) -> Any? in
         if task.isCancelled {
             taskCompletionSource.tryCancel()
         } else if let error = task.error , task.isFaulted {
@@ -41,5 +42,19 @@ func swiftTask(_ task: BFTask<AnyObject>) -> Task<AnyObject> {
         }
         return nil
     })
+    
+    //    task.continueWith(block: { task in
+    //        if task.isCancelled {
+    //            taskCompletionSource.tryCancel()
+    //        } else if let error = task.error , task.isFaulted {
+    //            taskCompletionSource.trySet(error: error)
+    //        } else if let result = task.result {
+    //            taskCompletionSource.trySet(result: result)
+    //        } else {
+    //            fatalError("Unknown task state")
+    //        }
+    //        return nil
+    //    })
     return taskCompletionSource.task
 }
+
