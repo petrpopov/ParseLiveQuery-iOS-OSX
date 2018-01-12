@@ -1,3 +1,5 @@
+# FIXED FOR XCODE 9 AND SWIFT 4 BOLTSHELPERS COMPIE ERROR
+
 # Parse LiveQuery Client for iOS/OSX
 
 [![Platforms][platforms-svg]][platforms-link]
